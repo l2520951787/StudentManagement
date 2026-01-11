@@ -1,5 +1,6 @@
 package raisetech.StudentManagement;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +20,11 @@ public class StudentManagementApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(StudentManagementApplication.class, args);
+  }
+
+  @GetMapping("/students")
+  public List<Student> studentList() {
+    return repository.findAll();
   }
 
   @GetMapping("/student")
