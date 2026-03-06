@@ -30,7 +30,8 @@ public class StudentService {
 
   public StudentDetail searchStudentDetail(String id) {
     Student student = repository.searchStudentById(id);
-    List<StudentsCourses> studentsCourses = repository.searchStudentsCoursesByStudentId(id);
+    List<StudentsCourses> studentsCourses = repository.searchStudentsCoursesByStudentId(
+        student.getId());
 
     StudentDetail studentDetail = new StudentDetail();
     studentDetail.setStudent(student);
@@ -54,12 +55,12 @@ public class StudentService {
   public void updateStudent(StudentDetail studentDetail) {
     Student student = studentDetail.getStudent();
     repository.updateStudent(student);
-    repository.deleteStudentsCourses(student.getId());
+    if (student.isDeleted()) {
+      repository.logicDeleteStudentsCourses(student.getId());
+      return;
+    }
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
-      studentsCourses.setStudentId(studentDetail.getStudent().getId());
-      studentsCourses.setStartDate(LocalDateTime.now());
-      studentsCourses.setEndDate(LocalDateTime.now().plusMonths(6));
-      repository.registerStudentsCourses(studentsCourses);
+      repository.updateStudentsCourses(studentsCourses);
     }
   }
 }

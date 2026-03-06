@@ -1,7 +1,6 @@
 package raisetech.StudentManagement.repository;
 
 import java.util.List;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -13,10 +12,10 @@ import raisetech.StudentManagement.data.StudentsCourses;
 @Mapper
 public interface StudentRepository {
 
-  @Select("SELECT * FROM students")
+  @Select("SELECT * FROM students WHERE deleted = false")
   List<Student> searchStudent();
 
-  @Select("SELECT * FROM students_courses")
+  @Select("SELECT * FROM students_courses WHERE id = #{id}")
   List<StudentsCourses> searchStudentsCourses();
 
   @Select("SELECT * FROM students WHERE id = #{id}")
@@ -31,7 +30,7 @@ public interface StudentRepository {
   @Options(useGeneratedKeys = true, keyProperty = "id")
   void registerStudent(Student student);
 
-  @Insert("INSERT INTO students_courses(student_id, course, start_date, end_date) "
+  @Insert("INSERT INTO students_courses(student_id, course, start_date, end_date)"
       + "VALUES(#{studentId}, #{course}, #{startDate}, #{endDate})")
   @Options(useGeneratedKeys = true, keyProperty = "id")
   void registerStudentsCourses(StudentsCourses studentsCourses);
@@ -44,10 +43,14 @@ public interface StudentRepository {
       + "area = #{area},"
       + "age = #{age},"
       + "gender = #{gender},"
-      + "remark = #{remark}"
+      + "remark = #{remark},"
+      + "deleted = #{deleted} "
       + "WHERE id = #{id}")
   void updateStudent(Student student);
 
-  @Delete("DELETE FROM students_courses WHERE student_id = #{studentId}")
-  void deleteStudentsCourses(String studentId);
+  @Update("UPDATE students_courses SET course = #{course} WHERE id = #{id}")
+  void updateStudentsCourses(StudentsCourses studentsCourses);
+
+  @Update("UPDATE students_courses SET deleted = true WHERE id = #{id}")
+  void logicDeleteStudentsCourses(String id);
 }
