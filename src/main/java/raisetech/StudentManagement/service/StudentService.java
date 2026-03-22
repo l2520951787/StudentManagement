@@ -53,12 +53,7 @@ public class StudentService {
 
   @Transactional
   public void updateStudent(StudentDetail studentDetail) {
-    Student student = studentDetail.getStudent();
-    repository.updateStudent(student);
-    if (student.isDeleted()) {
-      repository.logicDeleteStudentsCourses(student.getId());
-      return;
-    }
+    repository.updateStudent(studentDetail.getStudent());
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
       repository.updateStudentsCourses(studentsCourses);
     }

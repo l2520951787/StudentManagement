@@ -12,10 +12,10 @@ import raisetech.StudentManagement.data.StudentsCourses;
 @Mapper
 public interface StudentRepository {
 
-  @Select("SELECT * FROM students WHERE deleted = false")
+  @Select("SELECT * FROM students")
   List<Student> searchStudent();
 
-  @Select("SELECT * FROM students_courses WHERE id = #{id}")
+  @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCourses();
 
   @Select("SELECT * FROM students WHERE id = #{id}")
@@ -25,7 +25,7 @@ public interface StudentRepository {
   List<StudentsCourses> searchStudentsCoursesByStudentId(String studentId);
 
   @Insert(
-      "INSERT INTO students(name, ruby, nickname, mail_address, area, age, gender, remark, is_deleted)"
+      "INSERT INTO students(name, ruby, nickname, mail_address, area, age, gender, remark, deleted)"
           + " VALUES(#{name}, #{ruby}, #{nickname}, #{mailAddress}, #{area}, #{age}, #{gender}, #{remark}, false)")
   @Options(useGeneratedKeys = true, keyProperty = "id")
   void registerStudent(Student student);
@@ -36,14 +36,14 @@ public interface StudentRepository {
   void registerStudentsCourses(StudentsCourses studentsCourses);
 
   @Update("UPDATE students SET "
-      + "name = #{name},"
+      + "name = #{name}, "
       + "ruby = #{ruby}, "
-      + "nickname = #{nickname},"
-      + "mail_address = #{mailAddress},"
-      + "area = #{area},"
-      + "age = #{age},"
-      + "gender = #{gender},"
-      + "remark = #{remark},"
+      + "nickname = #{nickname}, "
+      + "mail_address = #{mailAddress}, "
+      + "area = #{area}, "
+      + "age = #{age}, "
+      + "gender = #{gender}, "
+      + "remark = #{remark}, "
       + "deleted = #{deleted} "
       + "WHERE id = #{id}")
   void updateStudent(Student student);

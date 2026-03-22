@@ -1,11 +1,13 @@
 package raisetech.StudentManagement.data;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "studentId", "course", "startDate", "endDate", "deleted"})
 public class StudentsCourses {
 
   private String id;
