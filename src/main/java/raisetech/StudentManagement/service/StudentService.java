@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.studentCourse;
+import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.StudentNotFoundException;
 import raisetech.StudentManagement.repository.StudentRepository;
 
 /**
@@ -33,7 +34,8 @@ public class StudentService {
    */
   public List<StudentDetail> getStudentList() {
     List<Student> studentList = repository.getStudentList();
-    List<studentCourse> studentCourseList = repository.getStudentCourseList();
+    
+    List<StudentCourse> studentCourseList = repository.getStudentCourseList();
     return converter.convertStudentDetails(studentList, studentCourseList);
   }
 
@@ -45,7 +47,12 @@ public class StudentService {
    */
   public StudentDetail searchStudentDetail(String id) {
     Student student = repository.searchStudentById(id);
-    List<studentCourse> studentCourse = repository.searchStudentCourseByStudentId(
+
+    if (student == null) {
+      throw new StudentNotFoundException("このIDの受講生は存在しません。");
+    }
+
+    List<StudentCourse> studentCourse = repository.searchStudentCourseByStudentId(
         student.getId());
     return new StudentDetail(student, studentCourse);
   }
@@ -74,7 +81,7 @@ public class StudentService {
    * @param studentCourses コース情報
    * @param student        受講生
    */
-  private void initStudentsCourses(studentCourse studentCourses, Student student) {
+  private void initStudentsCourses(StudentCourse studentCourses, Student student) {
     LocalDateTime now = LocalDateTime.now();
 
     studentCourses.setStudentId(student.getId());
