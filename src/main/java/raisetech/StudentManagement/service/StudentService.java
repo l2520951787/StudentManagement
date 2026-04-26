@@ -34,7 +34,6 @@ public class StudentService {
    */
   public List<StudentDetail> getStudentList() {
     List<Student> studentList = repository.getStudentList();
-    
     List<StudentCourse> studentCourseList = repository.getStudentCourseList();
     return converter.convertStudentDetails(studentList, studentCourseList);
   }
@@ -81,12 +80,12 @@ public class StudentService {
    * @param studentCourses コース情報
    * @param student        受講生
    */
-  private void initStudentsCourses(StudentCourse studentCourses, Student student) {
+  void initStudentsCourses(StudentCourse studentCourses, Student student) {
     LocalDateTime now = LocalDateTime.now();
 
     studentCourses.setStudentId(student.getId());
     studentCourses.setStartDate(now);
-    studentCourses.setEndDate(now.plusMonths(6));
+    studentCourses.setEndDate(now.plusYears(1));
   }
 
   /**
@@ -97,7 +96,10 @@ public class StudentService {
   @Transactional
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
-    studentDetail.getStudentCourseList()
-        .forEach(studentCourses -> repository.updateStudentCourse(studentCourses));
+
+    if (studentDetail.getStudentCourseList() != null) {
+      studentDetail.getStudentCourseList()
+          .forEach(repository::updateStudentCourse);
+    }
   }
 }
