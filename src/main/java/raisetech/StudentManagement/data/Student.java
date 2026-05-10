@@ -14,9 +14,8 @@ import lombok.Setter;
 @JsonPropertyOrder({"id", "name", "ruby", "nickname", "mailAddress", "area", "age", "gender",
     "remark", "deleted"})
 public class Student {
-
-  @NotBlank
-  @Pattern(regexp = "^\\d+$")
+  
+  @Pattern(regexp = "^\\d+$", message = "数字のみ入力してください。")
   private String id;
 
   @NotBlank
