@@ -59,6 +59,7 @@ class StudentServiceTest {
     // 事前準備
     String id = "99";
     Student student = new Student();
+    student.setId(id);
     List<StudentCourse> courses = List.of(new StudentCourse());
     when(repository.searchStudentById(id)).thenReturn(student);
     when(repository.searchStudentCourseByStudentId(id)).thenReturn(courses);
