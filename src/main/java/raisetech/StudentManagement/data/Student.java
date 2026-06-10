@@ -17,7 +17,7 @@ public class Student {
 
   @NotBlank
   @Pattern(regexp = "^\\d+$")
-  private String id;
+  private int id;
 
   @NotBlank
   private String name;
@@ -35,7 +35,7 @@ public class Student {
   @NotBlank
   private String area;
 
-  private int age;
+  private Integer age;
 
   @NotBlank
   private String gender;
