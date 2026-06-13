@@ -2,8 +2,8 @@ package raisetech.StudentManagement.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.domain.StudentDetail;
-import raisetech.StudentManagement.exception.TestException;
+import raisetech.StudentManagement.dto.StudentSearchCondition;
 import raisetech.StudentManagement.service.StudentService;
 
 /**
@@ -39,8 +41,8 @@ public class StudentController {
    */
   @Operation(summary = "一覧検索", description = "受講生の一覧を検索します。")
   @GetMapping("/studentList")
-  public List<StudentDetail> getStudentList() throws TestException {
-    throw new TestException("現在このAPIは利用できません。");
+  public List<StudentDetail> getStudentList(StudentSearchCondition condition) {
+    return service.getStudentList(condition);
   }
 
   /**
@@ -49,10 +51,8 @@ public class StudentController {
    * @param id 受講生ID
    * @return 受講生詳細
    */
-  @Operation(summary = "受講生詳細検索", description = "受講生IDから受講生詳細の検索をします。")
   @GetMapping("/student/{id}")
-  public StudentDetail searchStudent(
-      @PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
+  public StudentDetail searchStudent(@PathVariable @Min(1) @Max(999) int id) {
     return service.searchStudentDetail(id);
   }
 
@@ -80,6 +80,18 @@ public class StudentController {
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDetail studentDetail) {
     service.updateStudent(studentDetail);
+    return ResponseEntity.ok("更新に成功しました。");
+  }
+
+  @GetMapping("/courseStatus")
+  public List<CourseStatus> getCourseStatus() {
+    return service.getAllCourseStatus();
+  }
+
+  @PutMapping("/course/{courseId}/status")
+  public ResponseEntity<String> updateCourseStatus(@PathVariable int courseId,
+      @RequestParam String status) {
+    service.updateCourseStatus(courseId, status);
     return ResponseEntity.ok("更新に成功しました。");
   }
 }

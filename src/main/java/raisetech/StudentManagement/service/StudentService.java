@@ -1,14 +1,16 @@
 package raisetech.StudentManagement.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchCondition;
 import raisetech.StudentManagement.exception.StudentNotFoundException;
 import raisetech.StudentManagement.repository.StudentRepository;
 
@@ -32,10 +34,12 @@ public class StudentService {
    *
    * @return 受講生詳細一覧(全件)
    */
-  public List<StudentDetail> getStudentList() {
-    List<Student> studentList = repository.getStudentList();
+  public List<StudentDetail> getStudentList(StudentSearchCondition condition) {
+    List<Student> studentList = repository.getStudentList(condition);
     List<StudentCourse> studentCourseList = repository.getStudentCourseList();
-    return converter.convertStudentDetails(studentList, studentCourseList);
+    List<CourseStatus> courseStatusList = repository.getCourseStatusList();
+
+    return converter.convertStudentDetails(studentList, studentCourseList, courseStatusList);
   }
 
   /**
@@ -44,7 +48,7 @@ public class StudentService {
    * @param id 受講生ID
    * @return 受講生詳細
    */
-  public StudentDetail searchStudentDetail(String id) {
+  public StudentDetail searchStudentDetail(int id) {
     Student student = repository.searchStudentById(id);
 
     if (student == null) {
@@ -53,7 +57,9 @@ public class StudentService {
 
     List<StudentCourse> studentCourse = repository.searchStudentCourseByStudentId(
         student.getId());
-    return new StudentDetail(student, studentCourse);
+
+    List<CourseStatus> courseStatus = repository.searchCourseStatus(id);
+    return new StudentDetail(student, studentCourse, courseStatus);
   }
 
   /**
@@ -70,6 +76,11 @@ public class StudentService {
     studentDetail.getStudentCourseList().forEach(studentCourses -> {
       initStudentsCourse(studentCourses, student.getId());
       repository.registerStudentCourse(studentCourses);
+
+      CourseStatus courseStatus = new CourseStatus();
+      courseStatus.setCourseId(studentCourses.getId());
+      courseStatus.setStatus("仮申込");
+      repository.registerCourseStatus(courseStatus);
     });
     return studentDetail;
   }
@@ -80,12 +91,22 @@ public class StudentService {
    * @param studentCourses コース情報
    * @param id             受講生ID
    */
-  void initStudentsCourse(StudentCourse studentCourses, String id) {
-    LocalDateTime now = LocalDateTime.now();
+  void initStudentsCourse(StudentCourse studentCourses, int id) {
+    LocalDate now = LocalDate.now();
 
     studentCourses.setStudentId(id);
     studentCourses.setStartDate(now);
     studentCourses.setEndDate(now.plusYears(1));
+  }
+
+  public List<StudentDetail> searchStudentsByCondition(String name, String mailAddress,
+      Integer age) {
+    List<Student> students = repository.searchByCondition(name, mailAddress, age);
+    List<StudentCourse> courses = repository.getStudentCourseList();
+    List<CourseStatus> courseStatuses = students.stream()
+        .flatMap(student -> repository.searchCourseStatus(student.getId()).stream())
+        .toList();
+    return converter.convertStudentDetails(students, courses, courseStatuses);
   }
 
   /**
@@ -96,10 +117,23 @@ public class StudentService {
   @Transactional
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
+    studentDetail.getStudentCourseList().forEach(studentCourse -> {
+      studentCourse.setStudentId(studentDetail.getStudent().getId());
+      repository.updateStudentCourse(studentCourse);
 
-    if (studentDetail.getStudentCourseList() != null) {
-      studentDetail.getStudentCourseList()
-          .forEach(repository::updateStudentCourse);
-    }
+      studentDetail.getCourseStatusList().stream()
+          .filter(status -> status.getCourseId() == studentCourse.getId())
+          .findFirst()
+          .ifPresent(
+              status -> repository.updateCourseStatus(status.getCourseId(), status.getStatus()));
+    });
+  }
+
+  public void updateCourseStatus(int courseId, String status) {
+    repository.updateCourseStatus(courseId, status);
+  }
+
+  public List<CourseStatus> getAllCourseStatus() {
+    return repository.getCourseStatusList();
   }
 }

@@ -5,7 +5,31 @@
 
   <!-- 受講生情報の全件検索 -->
   <select id="getStudentList" resultType="raisetech.StudentManagement.data.Student">
-    SELECT * FROM students
+    SELECT DISTINCT s.* FROM students s
+
+    LEFT JOIN students_courses sc ON s.id = sc.Student_id
+
+    <where>
+
+      AND s.is_deleted = false
+
+      <if test="name != null and name != ''">
+        AND name LIKE CONCAT('%', #{name}, '%')
+      </if>
+
+      <if test="area != null and area != ''">
+        AND area = #{area}
+      </if>
+
+      <if test="mailAddress != null and mailAddress != ''">
+        AND mail_address LIKE CONCAT('%', #{mailAddress}, '%')
+      </if>
+
+      <if test="course != null and course != ''">
+        AND sc.course LIKE CONCAT('%', #{course}, '%')
+      </if>
+
+    </where>
   </select>
 
   <!-- 受講生情報の検索 -->
@@ -24,10 +48,28 @@
     SELECT * FROM students_courses WHERE student_id = #{studentId}
   </select>
 
+  <select id="searchByCondition" parameterType="map"
+    resultType="raisetech.StudentManagement.data.Student">
+    SELECT * FROM student
+    WHERE is_deleted = false
+    AND (#{name} IS NULL OR name LIKE CONCAT('%', #{name}, '%')
+    AND (#{mailAddress} IS NULL OR mail_address LIKE CONCAT('%', #{mailAddress}, '%')
+    AND (#{age} IS NULL OR age = #{age})
+  </select>
+
+  <select id="getCourseStatusList" resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status
+  </select>
+
+  <select id="searchCourseStatus"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status WHERE id = #{id}
+  </select>
+
   <!-- 受講生情報の登録　-->
   <insert id="registerStudent" parameterType="raisetech.StudentManagement.data.Student"
     useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO students(name, ruby, nickname, mail_address, area, age, gender, remark, deleted)
+    INSERT INTO students(name, ruby, nickname, mail_address, area, age, gender, remark, is_deleted)
     VALUES(#{name}, #{ruby}, #{nickname}, #{mailAddress}, #{area}, #{age}, #{gender}, #{remark},
     false)
   </insert>
@@ -37,6 +79,12 @@
     useGeneratedKeys="true" keyProperty="id">
     INSERT INTO students_courses(student_id, course, start_date, end_date) VALUES(#{studentId},
     #{course}, #{startDate}, #{endDate})
+  </insert>
+
+  <!-- 申込状況の登録 -->
+  <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus"
+    useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO course_status(course_id, status) VALUES(#{courseId}, #{status})
   </insert>
 
   <!-- 受講生情報の更新 -->
@@ -50,5 +98,10 @@
   <!-- コース情報の更新 -->
   <update id="updateStudentCourse" parameterType="raisetech.StudentManagement.data.StudentCourse">
     UPDATE students_courses SET course = #{course} WHERE id = #{id}
+  </update>
+
+  <!-- 申込状況の更新 -->
+  <update id="updateCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus">
+    UPDATE course_status SET status = #{status} WHERE course_id = #{courseId}
   </update>
 </mapper>
