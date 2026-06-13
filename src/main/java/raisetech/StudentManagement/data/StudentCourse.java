@@ -12,8 +12,8 @@ import lombok.Setter;
 @JsonPropertyOrder({"id", "studentId", "course", "startDate", "endDate"})
 public class StudentCourse {
 
-  private int id;
-  private int studentId;
+  private Integer id;
+  private Integer studentId;
   private String course;
   private LocalDate startDate;
   private LocalDate endDate;

@@ -13,8 +13,8 @@ import lombok.Setter;
 @Schema(description = "受講コースの申込状況")
 public class CourseStatus {
 
-  private int id;
-  private int courseId;
+  private Integer id;
+  private Integer courseId;
   private String status;
 
 }
