@@ -130,6 +130,7 @@ class StudentServiceTest {
   void 受講生詳細の登録_リポジトリの処理が適切に呼び出されていること() {
     // 事前準備
     Student student = new Student();
+    student.setId(1);
     StudentCourse studentCourse = new StudentCourse();
     List<StudentCourse> studentCourseList = List.of(studentCourse);
     List<CourseStatus> courseStatusList = new ArrayList<>();
