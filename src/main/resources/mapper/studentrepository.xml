@@ -92,7 +92,7 @@
     UPDATE students SET name = #{name}, ruby = #{ruby}, nickname = #{nickname},
     mail_address = #{mailAddress}, area = #{area}, age = #{age}, gender = #{gender}, remark =
     #{remark},
-    deleted = #{deleted} WHERE id = #{id}
+    is_deleted = #{deleted} WHERE id = #{id}
   </update>
 
   <!-- コース情報の更新 -->

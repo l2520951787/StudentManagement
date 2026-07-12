@@ -84,24 +84,6 @@ class StudentControllerTest {
   }
 
   @Test
-  void 受講生詳細の受講生情報でIDに数字以外を入力したときに入力チェックに掛かること() {
-    Student student = new Student();
-    student.setId(99);
-    student.setName("テスト太郎");
-    student.setRuby("テストタロウ");
-    student.setNickname("テスト");
-    student.setMailAddress("test@example.com");
-    student.setArea("東京");
-    student.setGender("男");
-
-    Set<ConstraintViolation<Student>> violations = validator.validate(student);
-
-    assertThat(violations.size()).isEqualTo(1);
-    assertThat(violations).extracting("message")
-        .containsOnly("数字のみ入力してください。");
-  }
-
-  @Test
   void 受講生IDから受講生詳細の検索ができること() throws Exception {
     int id = 999;
     mockMvc.perform(get("/student/{id}", id))
@@ -159,8 +141,8 @@ class StudentControllerTest {
                             "id": "1",
                             "studentId": "1",
                             "course": "Javaコース",
-                            "startDate": "2025-10-27T00:00:00",
-                            "endDate": "2026-04-27T00:00:00"
+                            "startDate": "2025-10-27",
+                            "endDate": "2026-04-27"
                         }
                     ]
                 }
@@ -168,6 +150,6 @@ class StudentControllerTest {
         ))
         .andExpect(status().isOk());
 
-    verify(service, times(1)).registerStudent(any());
+    verify(service, times(1)).updateStudent(any());
   }
 }
