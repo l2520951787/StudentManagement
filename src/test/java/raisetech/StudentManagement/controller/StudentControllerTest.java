@@ -111,6 +111,11 @@ class StudentControllerTest {
                         {
                             "course": "Javaコース"
                         }
+                    ],
+                    "courseStatusList": [
+                        {
+                        "status": "仮申込"
+                        }
                     ]
                 }
                 """
