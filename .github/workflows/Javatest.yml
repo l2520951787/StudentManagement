@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  EC2_USER: 'ec2_user'
+  EC2_USER: 'ec2-user'
   EC2_HOST: '52.195.190.75'
   SRC_PATH: 'build/libs/*.jar'
   DEST_PATH: '/home/ec2-user/StudentManagement.jar'
@@ -41,7 +41,7 @@ jobs:
 
       - name: SCP Copy Application to EC2
         env:
-          PRIVATE_KEY: ${{ secrets.AWS_SC2_PRIVATE_KEY }}
+          PRIVATE_KEY: ${{ secrets.AWS_EC2_PRIVATE_KEY }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           scp -o StrictHostKeyChecking=no -i private_key $SRC_PATH $EC2_USER@$EC2_HOST:$DEST_PATH
